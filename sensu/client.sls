@@ -58,7 +58,9 @@ sensu_standalone_checks_file:
           keepalive: {{ sensu.client.keepalive }}
           {% endif %}
           {% if sensu.client.get("command_tokens") %}
-          command_tokens: {{ sensu.client.command_tokens }}
+          {%- for token_name, token_value in sensu.client.command_tokens.items() %}
+          {{ token_name }}: {{ token_value }}
+          {%- endfor %}
           {% endif %}
           {% if sensu.client.get("redact") %}
           redact: {{ sensu.client.redact }}
