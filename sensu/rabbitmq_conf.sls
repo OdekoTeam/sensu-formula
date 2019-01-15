@@ -15,16 +15,18 @@ include:
     {% endif %}
     - dataset:
         rabbitmq:
-          host: {{ sensu.rabbitmq.host }}
-          port: {{ sensu.rabbitmq.port }}
-          vhost: {{ sensu.rabbitmq.vhost }}
-          user: {{ sensu.rabbitmq.user }}
-          password: {{ sensu.rabbitmq.password }}
-          {% if sensu.ssl.enable %}
-          ssl:
-            cert_chain_file: /etc/sensu/ssl/cert.pem
-            private_key_file: /etc/sensu/ssl/key.pem
-          {%- endif %}
+          {%- for rabbit_node in salt['pillar.get']('sensu:rabbitmq')%}
+          - host: {{ rabbit_node.host }}
+            port: {{ rabbit_node.port }}
+            vhost: {{ rabbit_node.vhost }}
+            user: {{ rabbit_node.user }}
+            password: {{ rabbit_node.password }}
+            {%- if sensu.ssl.enable %}
+            ssl:
+              cert_chain_file: /etc/sensu/ssl/cert.pem
+              private_key_file: /etc/sensu/ssl/key.pem
+            {%- endif %}
+          {%- endfor %}
 
 {%- if salt['pillar.get']('sensu:ssl:enable', false) %}
 /etc/sensu/ssl:

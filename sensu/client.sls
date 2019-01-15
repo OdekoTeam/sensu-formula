@@ -58,7 +58,9 @@ sensu_standalone_checks_file:
           keepalive: {{ sensu.client.keepalive }}
           {% endif %}
           {% if sensu.client.get("command_tokens") %}
-          command_tokens: {{ sensu.client.command_tokens }}
+          {%- for token_name, token_value in sensu.client.command_tokens.items() %}
+          {{ token_name }}: {{ token_value }}
+          {%- endfor %}
           {% endif %}
           {% if sensu.client.get("redact") %}
           redact: {{ sensu.client.redact }}
@@ -124,8 +126,10 @@ install_{{ gem_name }}:
     {% endif %}
     - rdoc: False
     - ri: False
-    - proxy: {{ salt['pillar.get']('sensu:client:gem_proxy') }}
-    - source: {{ salt['pillar.get']('sensu:client:gem_source') }}
+    - proxy: {{ salt['pillar.get']('sensu:client:gem_proxy', None) }}
+    - source: {{ salt['pillar.get']('sensu:client:gem_source', None) }}
+    - require_in:
+      - service: sensu-client
 {% endfor %}
 
 sensu-client:
